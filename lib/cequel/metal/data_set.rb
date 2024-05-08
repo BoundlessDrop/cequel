@@ -51,6 +51,7 @@ module Cequel
       attr_reader :query_page_size
       attr_reader :query_paging_state
       attr_reader :allow_filtering
+      attr_reader :custom_filter
 
       def_delegator :keyspace, :write_with_options
 
@@ -553,6 +554,12 @@ module Cequel
         end
       end
 
+      def set_custom_filter(filter)
+        clone.tap do |data_set|
+          data_set.custom_filter = filter
+        end
+      end
+
       # rubocop:disable LineLength
 
       #
@@ -683,7 +690,7 @@ module Cequel
             cql_fragments << cql_with_vars.shift
             bind_vars.concat(cql_with_vars)
           end
-          [" WHERE #{cql_fragments.join(' AND ')}", *bind_vars]
+          [" WHERE #{cql_fragments.join(' AND ')} #{custom_filter}", *bind_vars]
         else ['']
         end
       end
@@ -696,7 +703,7 @@ module Cequel
         end
       end
 
-      attr_writer :row_limit, :query_consistency, :query_page_size, :query_paging_state, :allow_filtering
+      attr_writer :row_limit, :query_consistency, :query_page_size, :query_paging_state, :allow_filtering, :custom_filter
 
       def results
         @results ||= execute_cql(cql)

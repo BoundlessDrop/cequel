@@ -36,6 +36,7 @@ module Cequel
       def build
         add_limit
         add_select_columns
+        add_custom_filter
         add_where_statement
         add_bounds
         add_order
@@ -55,7 +56,7 @@ module Cequel
                      :scoped_secondary_columns, :lower_bound,
                      :upper_bound, :reversed?, :order_by_column,
                      :query_consistency, :query_page_size, :query_paging_state,
-                     :ascends_by?, :allow_filtering
+                     :ascends_by?, :allow_filtering, :custom_filter
 
       private
 
@@ -105,6 +106,10 @@ module Cequel
         if allow_filtering
           self.data_set = data_set.allow_filtering!
         end
+      end
+
+      def add_custom_filter
+        self.data_set = data_set.set_custom_filter(custom_filter)
       end
 
       def set_page_size
