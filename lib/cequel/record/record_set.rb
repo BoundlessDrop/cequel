@@ -107,7 +107,7 @@ module Cequel
 
       # @private
       def self.default_attributes
-        { scoped_key_values: [], select_columns: [], scoped_secondary_columns: {} }
+        { scoped_key_values: [], select_columns: [], scoped_secondary_columns: {}, custom_filters: [] }
       end
 
       # @return [Class] the Record class that this collection yields instances
@@ -177,10 +177,6 @@ module Cequel
         scoped(row_limit: count)
       end
 
-      def custom_filters(filter)
-        scoped(custom_filter: filter)
-      end
-
       #
       # Filter the record set to records containing a given value in an indexed
       # column
@@ -209,9 +205,8 @@ module Cequel
         if args.length == 1
           column_filters = args.first.symbolize_keys
         elsif args.length == 2
-          warn "where(column_name, value) is deprecated. Use " \
-               "where(column_name => value) instead"
-          column_filters = {args.first.to_sym => args.second}
+          scoped(custom_filters: custom_filters.append(args))
+          return self
         else
           fail ArgumentError,
                "wrong number of arguments (#{args.length} for 1..2)"
@@ -749,7 +744,7 @@ module Cequel
                    :row_limit, :lower_bound, :upper_bound,
                    :scoped_secondary_columns, :query_consistency,
                    :query_page_size, :query_paging_state,
-                   :allow_filtering, :custom_filter
+                   :allow_filtering, :custom_filters
 
       protected
 
