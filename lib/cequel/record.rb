@@ -81,6 +81,7 @@ module Cequel
     extend Util::Forwardable
 
     included do
+      include Dirty
       include Properties
       include Schema
       include Persistence
@@ -90,7 +91,6 @@ module Cequel
       include MassAssignment
       include Callbacks
       include Validations
-      include Dirty
       extend ActiveModel::Naming
       include Conversion
       include ActiveModel::Serializers::JSON
